@@ -2,15 +2,48 @@ using UnityEngine;
 
 public class ResourceGenerator : MonoBehaviour
 {
-    private BuildingTypeSO _buildingType;
+    private ResourceGeneratorData _resourceGeneratorData;
     private float _timer;
     private float _timeToGenerateResource;
 
     private void Awake()
     {
-        _buildingType = GetComponent<BuildingTypeHolder>().buildingType;
-        _timeToGenerateResource = _buildingType.resourceGeneratorData.timeToGenerateResource;
+        _resourceGeneratorData = GetComponent<BuildingTypeHolder>().buildingType.resourceGeneratorData;
+        _timeToGenerateResource = _resourceGeneratorData.timeToGenerateResource;
         _timer = 1f;
+    }
+
+    private void Start()
+    {
+        int nearbyResourceAmount = 0;
+        
+        var collider2DArray = Physics2D.OverlapCircleAll(transform.position, _resourceGeneratorData.resourceNodeDetectionRadius);
+        foreach (var collider2D in collider2DArray)
+        {
+            var resourceNode = collider2D.GetComponent<ResourceNode>();
+            if (resourceNode != null)
+            {
+                if (resourceNode.resourceType == _resourceGeneratorData.resourceType)
+                {
+                    nearbyResourceAmount++;
+                }
+            }
+            else
+            {
+                _timeToGenerateResource = (_resourceGeneratorData.timeToGenerateResource / 2f) +
+                                          _resourceGeneratorData.timeToGenerateResource *
+                                          (1 - (float)nearbyResourceAmount /
+                                              _resourceGeneratorData.maxResourceNodeEffectiveAmount);
+            }
+        }
+
+        nearbyResourceAmount =
+            Mathf.Clamp(nearbyResourceAmount, 0, _resourceGeneratorData.maxResourceNodeEffectiveAmount);
+
+        if (nearbyResourceAmount == 0)
+        {
+            enabled = false;
+        }
     }
 
     private void Update()
@@ -19,7 +52,7 @@ public class ResourceGenerator : MonoBehaviour
 
         if (_timer <= 0)
         {
-            ResourceManager.Instance.AddResource(_buildingType.resourceGeneratorData.resourceType, 1);
+            ResourceManager.Instance.AddResource(_resourceGeneratorData.resourceType, 1);
             _timer += _timeToGenerateResource;
         }
     }
