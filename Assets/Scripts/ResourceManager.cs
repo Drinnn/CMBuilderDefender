@@ -7,13 +7,13 @@ public class ResourceManager : MonoBehaviour
     public static ResourceManager Instance { get; private set; }
 
     public event EventHandler OnResourceAmountChanged;
-    
+
     private Dictionary<ResourceTypeSO, int> _resourceAmountDictionary;
 
     private void Awake()
     {
         Instance = this;
-        
+
         _resourceAmountDictionary = new Dictionary<ResourceTypeSO, int>();
 
         ResourceTypeListSO resourceTypeList = Resources.Load<ResourceTypeListSO>(nameof(ResourceTypeListSO));

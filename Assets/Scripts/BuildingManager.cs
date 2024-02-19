@@ -30,14 +30,17 @@ public class BuildingManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject() && _buildingType != null)
         {
-            PlaceBuilding();
+            Vector3 mouseWorldPosition = Utils.GetMouseWorldPosition();
+            if (CanSpawnBuilding(_buildingType, mouseWorldPosition))
+            {
+                PlaceBuilding(mouseWorldPosition);
+            }
         }
     }
 
-    private void PlaceBuilding()
+    private void PlaceBuilding(Vector3 position)
     {
-        Vector3 mouseWorldPosition = Utils.GetMouseWorldPosition();
-        Instantiate(_buildingType.prefab, mouseWorldPosition, Quaternion.identity);
+        Instantiate(_buildingType.prefab, position, Quaternion.identity);
     }
 
     public void SetActiveBuildingType(BuildingTypeSO buildingType)
@@ -58,5 +61,33 @@ public class BuildingManager : MonoBehaviour
     public BuildingTypeSO GetActiveBuildingType()
     {
         return _buildingType;
+    }
+    
+    private bool CanSpawnBuilding(BuildingTypeSO buildingType, Vector3 position)
+    {
+        var boxCollider2D = buildingType.prefab.GetComponent<BoxCollider2D>();
+
+        var collider2DArray = Physics2D.OverlapBoxAll(position + (Vector3)boxCollider2D.offset, boxCollider2D.size, 0);
+
+        bool isAreaClear = collider2DArray.Length == 0;
+        if (!isAreaClear)
+        {
+            return false;
+        }
+
+        collider2DArray = Physics2D.OverlapCircleAll(position, buildingType.minConstructionInBetweenRadius);
+        foreach (var collider2D in collider2DArray)
+        {
+            BuildingTypeHolder buildingTypeHolder = collider2D.GetComponent<BuildingTypeHolder>();
+            if (buildingTypeHolder != null)
+            {
+                if (buildingTypeHolder.buildingType == buildingType)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
