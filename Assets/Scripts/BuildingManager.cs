@@ -6,7 +6,12 @@ public class BuildingManager : MonoBehaviour
 {
     public static BuildingManager Instance { get; private set; }
 
-    public event EventHandler OnActiveBuildingTypeChanged;
+    public class OnActivebuildingTypeChangedEventArgs : EventArgs
+    {
+        public BuildingTypeSO activeBuildingType;
+    }
+
+    public event EventHandler<OnActivebuildingTypeChangedEventArgs> OnActiveBuildingTypeChanged;
 
     private Camera _camera;
     private BuildingTypeSO _buildingType;
@@ -31,15 +36,8 @@ public class BuildingManager : MonoBehaviour
 
     private void PlaceBuilding()
     {
-        Vector3 mouseWorldPosition = GetMouseWorldPosition();
+        Vector3 mouseWorldPosition = Utils.GetMouseWorldPosition();
         Instantiate(_buildingType.prefab, mouseWorldPosition, Quaternion.identity);
-    }
-
-    private Vector3 GetMouseWorldPosition()
-    {
-        Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPosition.z = 0f;
-        return mouseWorldPosition;
     }
 
     public void SetActiveBuildingType(BuildingTypeSO buildingType)
@@ -52,8 +50,9 @@ public class BuildingManager : MonoBehaviour
         {
             _buildingType = buildingType;
         }
-        
-        OnActiveBuildingTypeChanged?.Invoke(this, EventArgs.Empty);
+
+        OnActiveBuildingTypeChanged?.Invoke(this,
+            new OnActivebuildingTypeChangedEventArgs { activeBuildingType = _buildingType });
     }
 
     public BuildingTypeSO GetActiveBuildingType()
