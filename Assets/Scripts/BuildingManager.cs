@@ -36,6 +36,10 @@ public class BuildingManager : MonoBehaviour
                 PlaceBuilding(mouseWorldPosition);
             }
         }
+        else if (Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject() && _buildingType != null)
+        {
+            SetActiveBuildingType(null);
+        }
     }
 
     private void PlaceBuilding(Vector3 position)
@@ -62,7 +66,7 @@ public class BuildingManager : MonoBehaviour
     {
         return _buildingType;
     }
-    
+
     private bool CanSpawnBuilding(BuildingTypeSO buildingType, Vector3 position)
     {
         var boxCollider2D = buildingType.prefab.GetComponent<BoxCollider2D>();
