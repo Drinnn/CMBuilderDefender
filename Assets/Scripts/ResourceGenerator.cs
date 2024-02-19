@@ -16,8 +16,9 @@ public class ResourceGenerator : MonoBehaviour
     private void Start()
     {
         int nearbyResourceAmount = 0;
-        
-        var collider2DArray = Physics2D.OverlapCircleAll(transform.position, _resourceGeneratorData.resourceNodeDetectionRadius);
+
+        var collider2DArray =
+            Physics2D.OverlapCircleAll(transform.position, _resourceGeneratorData.resourceNodeDetectionRadius);
         foreach (var collider2D in collider2DArray)
         {
             var resourceNode = collider2D.GetComponent<ResourceNode>();
@@ -28,13 +29,6 @@ public class ResourceGenerator : MonoBehaviour
                     nearbyResourceAmount++;
                 }
             }
-            else
-            {
-                _timeToGenerateResource = (_resourceGeneratorData.timeToGenerateResource / 2f) +
-                                          _resourceGeneratorData.timeToGenerateResource *
-                                          (1 - (float)nearbyResourceAmount /
-                                              _resourceGeneratorData.maxResourceNodeEffectiveAmount);
-            }
         }
 
         nearbyResourceAmount =
@@ -44,6 +38,15 @@ public class ResourceGenerator : MonoBehaviour
         {
             enabled = false;
         }
+        else
+        {
+            _timeToGenerateResource = (_resourceGeneratorData.timeToGenerateResource / 2f) +
+                                      _resourceGeneratorData.timeToGenerateResource *
+                                      (1 - (float)nearbyResourceAmount /
+                                          _resourceGeneratorData.maxResourceNodeEffectiveAmount);
+        }
+        
+        Debug.Log(_timeToGenerateResource);
     }
 
     private void Update()

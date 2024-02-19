@@ -6,6 +6,8 @@ public class BuildingManager : MonoBehaviour
 {
     public static BuildingManager Instance { get; private set; }
 
+    [SerializeField] private float maxConstructionRadius;
+
     public class OnActivebuildingTypeChangedEventArgs : EventArgs
     {
         public BuildingTypeSO activeBuildingType;
@@ -78,6 +80,8 @@ public class BuildingManager : MonoBehaviour
         {
             return false;
         }
+        
+        
 
         collider2DArray = Physics2D.OverlapCircleAll(position, buildingType.minConstructionInBetweenRadius);
         foreach (var collider2D in collider2DArray)
@@ -91,7 +95,17 @@ public class BuildingManager : MonoBehaviour
                 }
             }
         }
+        
+        collider2DArray = Physics2D.OverlapCircleAll(position, maxConstructionRadius);
+        foreach (var collider2D in collider2DArray)
+        {
+            BuildingTypeHolder buildingTypeHolder = collider2D.GetComponent<BuildingTypeHolder>();
+            if (buildingTypeHolder != null)
+            {
+                return true;
+            }
+        }
 
-        return true;
+        return false;
     }
 }

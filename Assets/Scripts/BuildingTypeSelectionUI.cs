@@ -6,6 +6,7 @@ public class BuildingTypeSelectionUI : MonoBehaviour
 {
     [SerializeField] private Transform buttonTemplate;
     [SerializeField] private float offsetBetweenButtons;
+    [SerializeField] private List<BuildingTypeSO> ignoredBuildingTypes;
 
     private Dictionary<BuildingTypeSO, Transform> _buttonTransformDictionary; 
 
@@ -20,6 +21,7 @@ public class BuildingTypeSelectionUI : MonoBehaviour
         var index = 0;
         foreach (var buildingType in buildingTypeList.list)
         {
+            if (ignoredBuildingTypes.Contains(buildingType)) continue;
             Transform buttonTransform = Instantiate(buttonTemplate, transform);
             buttonTransform.gameObject.SetActive(true);
 
