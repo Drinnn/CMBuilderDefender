@@ -1,16 +1,19 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class BuildingManager : MonoBehaviour
 {
+    public static BuildingManager Instance { get; private set; }
+
+    public event EventHandler OnActiveBuildingTypeChanged;
+
     private Camera _camera;
-    private BuildingTypeListSO _buildingTypeList;
     private BuildingTypeSO _buildingType;
 
     private void Awake()
     {
-        _buildingTypeList = Resources.Load<BuildingTypeListSO>(nameof(BuildingTypeListSO));
-
-        _buildingType = _buildingTypeList.list[0];
+        Instance = this;
     }
 
     private void Start()
@@ -20,19 +23,9 @@ public class BuildingManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject() && _buildingType != null)
         {
             PlaceBuilding();
-        }
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            _buildingType = _buildingTypeList.list[0];
-        }
-
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            _buildingType = _buildingTypeList.list[1];
         }
     }
 
@@ -47,5 +40,24 @@ public class BuildingManager : MonoBehaviour
         Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPosition.z = 0f;
         return mouseWorldPosition;
+    }
+
+    public void SetActiveBuildingType(BuildingTypeSO buildingType)
+    {
+        if (buildingType == _buildingType)
+        {
+            _buildingType = null;
+        }
+        else
+        {
+            _buildingType = buildingType;
+        }
+        
+        OnActiveBuildingTypeChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public BuildingTypeSO GetActiveBuildingType()
+    {
+        return _buildingType;
     }
 }
