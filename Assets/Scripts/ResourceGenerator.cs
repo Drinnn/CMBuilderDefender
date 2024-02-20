@@ -45,8 +45,6 @@ public class ResourceGenerator : MonoBehaviour
                                       (1 - (float)nearbyResourceAmount /
                                           _resourceGeneratorData.maxResourceNodeEffectiveAmount);
         }
-        
-        Debug.Log(_timeToGenerateResource);
     }
 
     private void Update()
